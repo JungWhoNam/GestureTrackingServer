@@ -3,13 +3,15 @@
 #include <iterator>
 #include <algorithm>
 
+#include <math.h>
+#include <chrono>
+
 #include "async-sockets/tcpserver.hpp"
+
+#define PI 3.14159265
 
 int main()
 {
-    int currIndex = 0;
-    std::string messages[4] = {"Hello", "Planet", "Earth", "..."};
-
     TCPServer tcpServer;
     std::list<TCPSocket*> tcpClients;
 
@@ -61,18 +63,19 @@ int main()
         std::cerr << errorCode << " : " << errorMessage << std::endl; 
     });
 
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     while (true) {
+        // Compute a value to send
+        float t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count() / 1000.0;
+        float v = sin(t * PI * 0.075);
+        // std::cout << "t=" << t << ", v=" << v << std::endl;
+
         for(TCPSocket* client : tcpClients) {
-            client->Send(messages[currIndex]);
+            client->Send(std::to_string(v));
         }
 
-        currIndex += 1;
-        if (currIndex >= sizeof(messages) / sizeof(std::string)) {
-            currIndex = 0;
-        }
-
-        // Sleeps for 3 second
-        usleep(3 * 1000000);
+        // Sleeps for 0.5 second
+        usleep(0.01 * 1000000);
     }
 
     // Close the server before exiting the program.
