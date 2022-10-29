@@ -1,3 +1,4 @@
+// based on https://github.com/eminfedar/async-sockets-cpp
 #include <iostream>
 #include <list>
 #include <iterator>
@@ -6,7 +7,11 @@
 #include <math.h>
 #include <chrono>
 
+#if defined(__linux__) || defined(__APPLE__)
 #include "async-sockets/tcpserver.hpp"
+#elif _WIN32
+#include "async-sockets-wins/tcpserver.hpp"
+#endif
 
 #define PI 3.14159265
 
@@ -48,6 +53,7 @@ int main()
                 std::cout << (*it)->remoteAddress() << ":" << (*it)->remotePort() << " ";
             }
             std::cout << '\n';
+            std::cout << std::flush;
         };
     };
 
@@ -75,7 +81,7 @@ int main()
         }
 
         // Sleeps for 0.5 second
-        usleep(0.01 * 1000000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     // Close the server before exiting the program.

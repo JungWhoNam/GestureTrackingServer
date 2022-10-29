@@ -1,6 +1,10 @@
-// copied from https://github.com/eminfedar/async-sockets-cpp
-
+// based on https://github.com/eminfedar/async-sockets-cpp
+#if defined(__linux__) || defined(__APPLE__)
 #include "async-sockets/tcpsocket.hpp"
+#elif _WIN32
+#include "async-sockets-wins/tcpsocket.hpp"
+#endif
+
 #include <iostream>
 
 using namespace std;
@@ -15,6 +19,7 @@ int main()
     // Start receiving from the host.
     tcpSocket.onMessageReceived = [](string message) {
         cout << "Message from the Server: " << message << endl;
+        std::cout << std::flush;
     };
     // If you want to use raw bytes instead of std::string:
     /*
@@ -33,7 +38,7 @@ int main()
         cout << "Connected to the server successfully." << endl;
 
         // Send String:
-        tcpSocket.Send("Hello Server!");
+        // tcpSocket.Send("Hello Server!");
     },
     [](int errorCode, std::string errorMessage){
         // CONNECTION FAILED
