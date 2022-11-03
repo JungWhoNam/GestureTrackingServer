@@ -5,10 +5,10 @@ project(GestureTrackingServer)
 set (CMAKE_CXX_STANDARD 14)
 message (STATUS "This build is for C++${CMAKE_CXX_STANDARD}")
 
+add_subdirectory(external)
+
 option(BUILD_EXAMPLES "Build networking examples" ON)
 if (BUILD_EXAMPLES)
-  add_subdirectory(async-sockets)
-
   add_executable("client" client.cpp)
   add_executable("server" server.cpp)
 
