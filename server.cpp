@@ -7,11 +7,7 @@
 #include <math.h>
 #include <chrono>
 
-#if defined(__linux__) || defined(__APPLE__)
 #include "async-sockets/tcpserver.hpp"
-#elif _WIN32
-#include "async-sockets-wins/tcpserver.hpp"
-#endif
 
 #define PI 3.14159265
 

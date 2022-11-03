@@ -1,9 +1,5 @@
 // based on https://github.com/eminfedar/async-sockets-cpp
-#if defined(__linux__) || defined(__APPLE__)
 #include "async-sockets/tcpsocket.hpp"
-#elif _WIN32
-#include "async-sockets-wins/tcpsocket.hpp"
-#endif
 
 #include <iostream>
 

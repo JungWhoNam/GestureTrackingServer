@@ -5,9 +5,22 @@ project(GestureTrackingServer)
 set (CMAKE_CXX_STANDARD 14)
 message (STATUS "This build is for C++${CMAKE_CXX_STANDARD}")
 
+option(BUILD_EXAMPLES "Build networking examples" ON)
+if (BUILD_EXAMPLES)
+  add_subdirectory(async-sockets)
 
-# add_executable("client" client.cpp)
-# add_executable("server" server.cpp)
+  add_executable("client" client.cpp)
+  add_executable("server" server.cpp)
+
+  target_link_libraries("client" network)
+  target_link_libraries("server" network)
+endif()
+
+if (NOT WIN32)
+  message (WARNING "The Kinect part is only supported in Windows.")
+  return()
+endif()
+
 add_executable(${CMAKE_PROJECT_NAME} kinectexample.cpp)
 
 
