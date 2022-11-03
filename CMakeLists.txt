@@ -24,9 +24,14 @@ endif()
 
 option(USE_k4abt "Enable k4abt" ON)
 set("k4abt_DIR_PATH" "C:/Program Files/Azure Kinect Body Tracking SDK/")
-if (USE_k4abt)
+if (USE_k4a AND USE_k4abt)
   include(k4abt)
   target_link_libraries(${CMAKE_PROJECT_NAME} k4a::k4abt)
+endif()
+
+if (USE_k4a AND USE_k4abt)
+  add_subdirectory(GestureTracker)
+  target_link_libraries (${CMAKE_PROJECT_NAME} GestureTracker)
 endif()
 
 # install dll files from Azure Kinect SDK
@@ -35,9 +40,9 @@ if(USE_k4a)
 
     string(REGEX MATCH "^.*/" _sharedlib_glob "${k4a_LIBNAME}")
     string(APPEND _sharedlib_glob "*${CMAKE_SHARED_LIBRARY_SUFFIX}*")
-    message(STATUS "_sharedlib_glob: ${_sharedlib_glob}")
+    # message(STATUS "_sharedlib_glob: ${_sharedlib_glob}")
     file(GLOB _sharedlibs LIST_DIRECTORIES false "${_sharedlib_glob}")
-    message(STATUS "_sharedlibs: ${_sharedlibs}")
+    # message(STATUS "_sharedlibs: ${_sharedlibs}")
 
     install(
       FILES ${_sharedlibs} 
@@ -58,9 +63,9 @@ if(USE_k4abt)
 
     string(REGEX MATCH "^.*/" _sharedlib_glob "${k4abt_LIBNAME}")
     string(APPEND _sharedlib_glob "*${CMAKE_SHARED_LIBRARY_SUFFIX}*")
-    message(STATUS "_sharedlib_glob: ${_sharedlib_glob}")
+    # message(STATUS "_sharedlib_glob: ${_sharedlib_glob}")
     file(GLOB _sharedlibs LIST_DIRECTORIES false "${_sharedlib_glob}")
-    message(STATUS "_sharedlibs: ${_sharedlibs}")
+    # message(STATUS "_sharedlibs: ${_sharedlibs}")
 
     install(
       FILES ${_sharedlibs} 
@@ -81,9 +86,9 @@ if(USE_k4abt)
 
     string(REGEX MATCH "^.*/" _sharedlib_glob "${k4abt_LIBNAME}")
     string(APPEND _sharedlib_glob "*.onnx*")
-    message(STATUS "_sharedlib_glob: ${_sharedlib_glob}")
+    # message(STATUS "_sharedlib_glob: ${_sharedlib_glob}")
     file(GLOB _sharedlibs LIST_DIRECTORIES false "${_sharedlib_glob}")
-    message(STATUS "_sharedlibs: ${_sharedlibs}")
+    # message(STATUS "_sharedlibs: ${_sharedlibs}")
 
     install(
       FILES ${_sharedlibs} 
