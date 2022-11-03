@@ -1,3 +1,4 @@
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -90,7 +91,7 @@ int main()
         }
 
         fflush(stdout);
-    } while (frame_count < 500);
+    } while (frame_count < 500 && !(GetAsyncKeyState(VK_CONTROL) && GetAsyncKeyState(0x51)));
 
     printf("Finished body tracking processing!\n");
 
