@@ -59,7 +59,22 @@ int main()
                 // Successfully popped the body tracking result. Start your processing
 
                 size_t num_bodies = k4abt_frame_get_num_bodies(body_frame);
-                printf("%zu bodies are detected!\n", num_bodies);
+                printf("In frame %d, %zu bodies are detected!\n", frame_count, num_bodies);
+
+                for (size_t i = 0; i < num_bodies; i++) {
+                    k4abt_skeleton_t skeleton;
+                    k4a_result_t skeleton_result = k4abt_frame_get_body_skeleton(body_frame, i, &skeleton);
+                    uint32_t id = k4abt_frame_get_body_id(body_frame, i);
+                    printf("Processing... index: %zu, id: %i\n", i, id);
+
+                    if (skeleton_result == K4A_RESULT_SUCCEEDED) {
+                        k4a_float3_t posLeft = skeleton.joints[K4ABT_JOINT_HAND_LEFT].position;
+                        printf("Left (%.2f, %.2f, %.2f), ", posLeft.v[0], posLeft.v[1],  posLeft.v[2]);
+                        k4a_float3_t posRight = skeleton.joints[K4ABT_JOINT_HAND_RIGHT].position;
+                        printf("Right (%.2f, %.2f, %.2f)", posRight.v[0], posRight.v[1],  posRight.v[2]);
+                        printf("\n");
+                    }
+                }
 
                 k4abt_frame_release(body_frame); // Remember to release the body frame once you finish using it
             }
@@ -87,7 +102,8 @@ int main()
             break;
         }
 
-    } while (frame_count < 100);
+        fflush(stdout);
+    } while (frame_count < 500);
 
     printf("Finished body tracking processing!\n");
 
