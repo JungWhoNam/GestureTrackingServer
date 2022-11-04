@@ -1,7 +1,8 @@
 // based on https://github.com/eminfedar/async-sockets-cpp
-#include "tcpsocket.hpp"
-
 #include <iostream>
+
+#include "tcpsocket.hpp"
+#include "json.hpp"
 
 using namespace std;
 
@@ -15,6 +16,12 @@ int main()
     // Start receiving from the host.
     tcpSocket.onMessageReceived = [](string message) {
         cout << "Message from the Server: " << message << endl;
+
+        nlohmann::ordered_json j = nlohmann::ordered_json::parse(message);
+        if (j == nullptr || j["hand_left"] == nullptr || j["hand_right"] == nullptr) return;
+        cout << "----> hand_left : " << j["hand_left"] << endl;
+        cout << "----> hand_right: " << j["hand_right"] << endl;
+
         std::cout << std::flush;
     };
     // If you want to use raw bytes instead of std::string:

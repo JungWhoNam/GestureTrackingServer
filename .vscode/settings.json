@@ -98,6 +98,8 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "cinttypes": "cpp",
-        "cerrno": "cpp"
+        "cerrno": "cpp",
+        "filesystem": "cpp",
+        "valarray": "cpp"
     }
 }

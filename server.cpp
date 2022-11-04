@@ -8,6 +8,7 @@
 #include <chrono>
 
 #include "tcpserver.hpp"
+#include "json.hpp"
 
 #define PI 3.14159265
 
@@ -67,13 +68,16 @@ int main()
 
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     while (true) {
-        // Compute a value to send
+        // Create a json object to send
         float t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count() / 1000.0;
-        float v = sin(t * PI * 0.075);
-        // std::cout << "t=" << t << ", v=" << v << std::endl;
-
+        nlohmann::ordered_json j;
+        j["hand_left"] = { -1, sin(t * PI * 0.075), 1};
+        j["hand_right"] = { 1, cos(t * PI * 0.075), 1};
+        
+        // serialize the json and send it to clients
+        std::string msg = j.dump();
         for(TCPSocket* client : tcpClients) {
-            client->Send(std::to_string(v));
+            client->Send(msg);
         }
 
         // Sleeps for 0.5 second

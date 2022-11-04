@@ -12,8 +12,8 @@ if (BUILD_EXAMPLES)
   add_executable("client" client.cpp)
   add_executable("server" server.cpp)
 
-  target_link_libraries("client" network)
-  target_link_libraries("server" network)
+  target_link_libraries("client" network json)
+  target_link_libraries("server" network json)
 endif()
 
 if (NOT WIN32)
