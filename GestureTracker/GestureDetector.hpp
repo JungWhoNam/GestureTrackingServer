@@ -6,6 +6,8 @@
 #include <k4a/k4a.h>
 #include <k4abt.h>
 
+#include "json.hpp"
+
 namespace GestureTracker {
     int getClosestBodyIndex(k4abt_frame_t body_frame) {
         size_t num_bodies = k4abt_frame_get_num_bodies(body_frame);
@@ -27,28 +29,29 @@ namespace GestureTracker {
         return bodyIndex;
     }
 
-    std::string createMessage(k4abt_frame_t body_frame) {
+    nlohmann::json createMessageJson(k4abt_frame_t body_frame) {
         int idx = getClosestBodyIndex(body_frame);
-
-        if (idx < 0) return "NONE";
-
-        std::string msg;
+        if (idx < 0) return {};
+        
+        nlohmann::ordered_json j;
         k4abt_skeleton_t skeleton;
         k4a_result_t skeleton_result = k4abt_frame_get_body_skeleton(body_frame, idx, &skeleton);
         if (skeleton_result == K4A_RESULT_SUCCEEDED) {
             {
-                k4abt_joint_id_t jointID = K4ABT_JOINT_HAND_LEFT;
-                k4a_float3_t pos = skeleton.joints[jointID].position;
-                msg += std::to_string(pos.v[0]) + "," +std::to_string(pos.v[1]) + "," +std::to_string(pos.v[2]);
+                k4a_float3_t pos = skeleton.joints[K4ABT_JOINT_HAND_LEFT].position;
+                j["hand_left"] = { pos.v[0], pos.v[1], pos.v[2] };
             }
-            msg += ",";
             {
-                k4abt_joint_id_t jointID = K4ABT_JOINT_HAND_RIGHT;
-                k4a_float3_t pos = skeleton.joints[jointID].position;
-                msg += std::to_string(pos.v[0]) + "," +std::to_string(pos.v[1]) + "," +std::to_string(pos.v[2]);
+                k4a_float3_t pos = skeleton.joints[K4ABT_JOINT_HAND_RIGHT].position;
+                j["hand_right"] = { pos.v[0], pos.v[1], pos.v[2] };
             }
         }
 
-        return msg;
+        return j;
+    }
+
+    std::string createMessage(k4abt_frame_t body_frame) {
+        nlohmann::json j = createMessageJson(body_frame);
+        return j.dump();
     }
 }

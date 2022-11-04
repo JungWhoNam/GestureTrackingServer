@@ -22,7 +22,7 @@ if (NOT WIN32)
 endif()
 
 add_executable(${CMAKE_PROJECT_NAME} kinectexample.cpp)
-
+target_link_libraries(${CMAKE_PROJECT_NAME} network json)
 
 list(APPEND CMAKE_MODULE_PATH
   ${PROJECT_SOURCE_DIR}/cmake

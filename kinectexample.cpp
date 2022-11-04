@@ -1,11 +1,15 @@
+#if defined (_WINDOWS_)
 #include <windows.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
+#include <list>
 
 #include <k4a/k4a.h>
 #include <k4abt.h>
 
 #include <GestureDetector.hpp>
+#include "tcpserver.hpp"
 
 #define VERIFY(result, error)                                                                            \
     if(result != K4A_RESULT_SUCCEEDED)                                                                   \
@@ -32,6 +36,43 @@ int main()
     k4abt_tracker_t tracker = NULL;
     k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
     VERIFY(k4abt_tracker_create(&sensor_calibration, tracker_config, &tracker), "Body tracker initialization failed!");
+
+    // Set the server
+    TCPServer tcpServer;
+    std::list<TCPSocket*> tcpClients;
+    // When a new client connected:
+    tcpServer.onNewConnection = [&](TCPSocket *newClient) {
+        std::cout << "New client: [" << newClient->remoteAddress() << ":" << newClient->remotePort() << "]" << std::endl;
+        
+        tcpClients.push_back(newClient);
+
+        newClient->onSocketClosed = [newClient, &tcpClients](int errorCode) {
+            std::cout << "Socket closed:" << newClient->remoteAddress() << ":" << newClient->remotePort() << " -> " << errorCode << std::endl;
+            std::cout << std::flush;
+
+            tcpClients.remove_if([newClient](TCPSocket*& var){
+                return (var->remoteAddress().compare(newClient->remoteAddress()) == 0) 
+                    && (var->remotePort() == newClient->remotePort());
+            });
+
+            std::cout << "Currently opended sockets: ";
+            for (std::list<TCPSocket*>::iterator it= tcpClients.begin(); it != tcpClients.end(); ++it) {
+                std::cout << (*it)->remoteAddress() << ":" << (*it)->remotePort() << " ";
+            }
+            std::cout << '\n';
+            std::cout << std::flush;
+        };
+    };
+    // Bind the server to a port.
+    tcpServer.Bind(8888, [](int errorCode, std::string errorMessage) {
+        // BINDING FAILED:
+        std::cerr << errorCode << " : " << errorMessage << std::endl; 
+    });
+    // Start Listening the server.
+    tcpServer.Listen([](int errorCode, std::string errorMessage) {
+        // LISTENING FAILED:
+        std::cerr << errorCode << " : " << errorMessage << std::endl; 
+    });
 
     int frame_count = 0;
     do
@@ -63,6 +104,11 @@ int main()
 
                 std::string msg = GestureTracker::createMessage(body_frame);
                 printf("In frame %d, the message is... %s\n", frame_count, msg.c_str());
+                
+                // Send the message to clients.
+                for(TCPSocket* client : tcpClients) {
+                    client->Send(msg);
+                }
 
                 k4abt_frame_release(body_frame); // Remember to release the body frame once you finish using it
             }
@@ -94,6 +140,9 @@ int main()
     } while (frame_count < 500 && !(GetAsyncKeyState(VK_CONTROL) && GetAsyncKeyState(0x51)));
 
     printf("Finished body tracking processing!\n");
+
+    // Close the server before exiting the program.
+    tcpServer.Close();
 
     k4abt_tracker_shutdown(tracker);
     k4abt_tracker_destroy(tracker);
