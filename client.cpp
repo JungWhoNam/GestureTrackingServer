@@ -18,9 +18,10 @@ int main()
         cout << "Message from the Server: " << message << endl;
 
         nlohmann::ordered_json j = nlohmann::ordered_json::parse(message);
-        if (j == nullptr || j["hand_left"] == nullptr || j["hand_right"] == nullptr) return;
-        cout << "----> hand_left : " << j["hand_left"] << endl;
-        cout << "----> hand_right: " << j["hand_right"] << endl;
+        if (j == nullptr || j["HAND_LEFT"] == nullptr || j["HAND_RIGHT"] == nullptr || j["SPINE_CHEST"] == nullptr) return;
+        cout << "----> HAND_LEFT: " << j["HAND_LEFT"] << endl;
+        cout << "----> HAND_RIGHT: " << j["HAND_RIGHT"] << endl;
+        cout << "----> SPINE_CHEST: " << j["SPINE_CHEST"] << endl;
 
         std::cout << std::flush;
     };

@@ -39,11 +39,15 @@ namespace GestureTracker {
         if (skeleton_result == K4A_RESULT_SUCCEEDED) {
             {
                 k4a_float3_t pos = skeleton.joints[K4ABT_JOINT_HAND_LEFT].position;
-                j["hand_left"] = { pos.v[0], pos.v[1], pos.v[2] };
+                j["HAND_LEFT"] = { pos.v[0], pos.v[1], pos.v[2] };
             }
             {
                 k4a_float3_t pos = skeleton.joints[K4ABT_JOINT_HAND_RIGHT].position;
-                j["hand_right"] = { pos.v[0], pos.v[1], pos.v[2] };
+                j["HAND_RIGHT"] = { pos.v[0], pos.v[1], pos.v[2] };
+            }
+            {
+                k4a_float3_t pos = skeleton.joints[K4ABT_JOINT_SPINE_CHEST].position;
+                j["SPINE_CHEST"] = { pos.v[0], pos.v[1], pos.v[2] };
             }
         }
 
