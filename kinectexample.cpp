@@ -15,7 +15,7 @@
     if(result != K4A_RESULT_SUCCEEDED)                                                                   \
     {                                                                                                    \
         printf("%s \n - (File: %s, Function: %s, Line: %d)\n", error, __FILE__, __FUNCTION__, __LINE__); \
-        exit(1);                                                                                         \
+        exit(EXIT_FAILURE);                                                                              \
     }                                                                                                    \
 
 int main()
@@ -37,41 +37,67 @@ int main()
     k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
     VERIFY(k4abt_tracker_create(&sensor_calibration, tracker_config, &tracker), "Body tracker initialization failed!");
 
-    // Set the server
-    TCPServer tcpServer;
-    std::list<TCPSocket*> tcpClients;
+    // Initialize the socket.
+    TCPServer tcpServer([&](int errorCode, std::string errorMessage){
+        std::cerr << "Socket creation error:" << errorCode << " : " << errorMessage << std::endl;
+
+        // close the camera.
+        if ((size_t) tracker->_rsvd != 0) k4abt_tracker_shutdown(tracker);
+        if ((size_t) tracker->_rsvd != 0) k4abt_tracker_destroy(tracker);
+        if ((size_t) device->_rsvd != 0) k4a_device_stop_cameras(device);
+        if ((size_t) device->_rsvd != 0) k4a_device_close(device);
+
+        exit(EXIT_FAILURE);
+    });
+
     // When a new client connected:
-    tcpServer.onNewConnection = [&](TCPSocket *newClient) {
-        std::cout << "New client: [" << newClient->remoteAddress() << ":" << newClient->remotePort() << "]" << std::endl;
-        
+    std::list<TCPSocket*> tcpClients;
+    tcpServer.onNewConnection = [&tcpClients](TCPSocket *newClient) {
+        std::cout << "New client: [" << newClient->remoteAddress() << ":" << newClient->remotePort() << "]" << std::endl << std::flush;
         tcpClients.push_back(newClient);
 
         newClient->onSocketClosed = [newClient, &tcpClients](int errorCode) {
             std::cout << "Socket closed:" << newClient->remoteAddress() << ":" << newClient->remotePort() << " -> " << errorCode << std::endl;
-            std::cout << std::flush;
 
-            tcpClients.remove_if([newClient](TCPSocket*& var){
-                return (var->remoteAddress().compare(newClient->remoteAddress()) == 0) 
-                    && (var->remotePort() == newClient->remotePort());
-            });
+            tcpClients.remove(newClient);
 
             std::cout << "Currently opended sockets: ";
             for (std::list<TCPSocket*>::iterator it= tcpClients.begin(); it != tcpClients.end(); ++it) {
                 std::cout << (*it)->remoteAddress() << ":" << (*it)->remotePort() << " ";
             }
-            std::cout << '\n';
-            std::cout << std::flush;
+            std::cout << '\n' << std::flush;
         };
     };
     // Bind the server to a port.
-    tcpServer.Bind(8888, [](int errorCode, std::string errorMessage) {
+    tcpServer.Bind(8888, [&](int errorCode, std::string errorMessage) {
         // BINDING FAILED:
-        std::cerr << errorCode << " : " << errorMessage << std::endl; 
+        std::cerr << errorCode << " : " << errorMessage << std::endl;
+        tcpServer.Close();
+
+        // close the camera.
+        if ((size_t) tracker->_rsvd != 0) k4abt_tracker_shutdown(tracker);
+        if ((size_t) tracker->_rsvd != 0) k4abt_tracker_destroy(tracker);
+        if ((size_t) device->_rsvd != 0) k4a_device_stop_cameras(device);
+        if ((size_t) device->_rsvd != 0) k4a_device_close(device);
+
+        exit(EXIT_FAILURE);
     });
     // Start Listening the server.
-    tcpServer.Listen([](int errorCode, std::string errorMessage) {
+    tcpServer.Listen([&](int errorCode, std::string errorMessage) {
         // LISTENING FAILED:
-        std::cerr << errorCode << " : " << errorMessage << std::endl; 
+        std::cerr << errorCode << " : " << errorMessage << std::endl;
+
+        if (errorCode == SOCKET_ERROR) { // fail to listen(...)
+            tcpServer.Close();
+
+            // close the camera.
+            if ((size_t) tracker->_rsvd != 0) k4abt_tracker_shutdown(tracker);
+            if ((size_t) tracker->_rsvd != 0) k4abt_tracker_destroy(tracker);
+            if ((size_t) device->_rsvd != 0) k4a_device_stop_cameras(device);
+            if ((size_t) device->_rsvd != 0) k4a_device_close(device);
+
+            exit(EXIT_FAILURE);
+        }
     });
 
     int frame_count = 0;
@@ -137,17 +163,18 @@ int main()
         }
 
         fflush(stdout);
-    } while (frame_count < 500 && !(GetAsyncKeyState(VK_CONTROL) && GetAsyncKeyState(0x51)));
+    } while (frame_count < 2000 && !(GetAsyncKeyState(VK_CONTROL) && GetAsyncKeyState(0x51)));
 
     printf("Finished body tracking processing!\n");
 
     // Close the server before exiting the program.
     tcpServer.Close();
 
-    k4abt_tracker_shutdown(tracker);
-    k4abt_tracker_destroy(tracker);
-    k4a_device_stop_cameras(device);
-    k4a_device_close(device);
+    // close the camera.
+    if ((size_t) tracker->_rsvd != 0) k4abt_tracker_shutdown(tracker);
+    if ((size_t) tracker->_rsvd != 0) k4abt_tracker_destroy(tracker);
+    if ((size_t) device->_rsvd != 0) k4a_device_stop_cameras(device);
+    if ((size_t) device->_rsvd != 0) k4a_device_close(device);
 
     return 0;
 }
