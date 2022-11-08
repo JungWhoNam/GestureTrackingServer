@@ -79,9 +79,9 @@ int main()
         // Create a json object to send
         float t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count() / 1000.0;
         nlohmann::ordered_json j;
-        j["HAND_LEFT"] = { -1, sin(t * PI * 0.075), 1};
-        j["HAND_RIGHT"] = { 1, cos(t * PI * 0.075), 1};
-        j["SPINE_CHEST"] = { 0, 0, 0 };
+        j["HAND_LEFT"] = { 100, sin(t * PI) * 400, 400};
+        j["HAND_RIGHT"] = { -100, cos(t * PI) * 400, 400};
+        j["SPINE_CHEST"] = { 0, 0, 400 };
         
         // serialize the json and send it to clients
         std::string msg = j.dump();
@@ -89,8 +89,8 @@ int main()
             client->Send(msg);
         }
 
-        // Sleeps for 0.5 second
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        // Sleeps for 0.05 second
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 
     // Close the server before exiting the program.
