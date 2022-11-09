@@ -68,10 +68,17 @@ int main()
         // LISTENING FAILED:
         std::cerr << errorCode << " : " << errorMessage << std::endl;
 
-        if (errorCode == SOCKET_ERROR) { // fail to listen(...)
-            tcpServer.Close();
-            exit(EXIT_FAILURE);
-        }
+        #if defined(__linux__) || defined(__APPLE__)
+            if (errorCode < 0) { // fail to listen(...)
+                tcpServer.Close();
+                exit(EXIT_FAILURE);
+            }
+        #elif _WIN32
+            if (errorCode == SOCKET_ERROR) { // fail to listen(...)
+                tcpServer.Close();
+                exit(EXIT_FAILURE);
+            }
+        #endif
     });
 
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();

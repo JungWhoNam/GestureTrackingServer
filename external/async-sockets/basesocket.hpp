@@ -4,6 +4,12 @@
 
 #if defined(__linux__) || defined(__APPLE__)
 
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <netdb.h>
+
 #include <string>
 #include <functional>
 #include <cerrno>

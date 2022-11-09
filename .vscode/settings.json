@@ -100,6 +100,8 @@
         "cinttypes": "cpp",
         "cerrno": "cpp",
         "filesystem": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "__tree": "cpp",
+        "stack": "cpp"
     }
 }
