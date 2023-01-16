@@ -129,7 +129,8 @@ int main()
                 // Successfully popped the body tracking result. Start your processing
 
                 std::string msg = GestureTracker::createMessage(body_frame);
-                printf("In frame %d, the message is... %s\n", frame_count, msg.c_str());
+                // printf("In frame %d, the message is... %s\n", frame_count, msg.c_str());
+                printf("Sending the frame %d...\n", frame_count);
                 
                 // Send the message to clients.
                 for(TCPSocket* client : tcpClients) {
@@ -163,7 +164,7 @@ int main()
         }
 
         fflush(stdout);
-    } while (frame_count < 2000 && !(GetAsyncKeyState(VK_CONTROL) && GetAsyncKeyState(0x51)));
+    } while (frame_count < 20000 && !(GetAsyncKeyState(VK_CONTROL) && GetAsyncKeyState(0x51)));
 
     printf("Finished body tracking processing!\n");
 
