@@ -13,27 +13,22 @@ The server application does three things:
 
 ```
 git clone https://github.com/jungwhonam-tacc/GestureTrackingServer.git
+cd GestureTrackingServer
 
-# switch to "windows" branch
-git checkout windows
-
-# create "build/release"
 mkdir build
 cd build
-mkdir release
 
 cmake \
 -S .. \
--B release \
--DCMAKE_BUILD_TYPE=Release \
+-B . \
 -DUSE_k4a=ON \
 -Dk4a_DIR_PATH="C:/Program Files/Azure Kinect SDK v1.4.1/" \
 -DUSE_k4abt=ON \
 -Dk4abt_DIR_PATH="C:/Program Files/Azure Kinect Body Tracking SDK/"
 
-cmake --build release
+cmake --build . --config Release
 
-cmake --install release
+cmake --install . --config Release
 ```
 
 CMake options to note (all have sensible defaults):
