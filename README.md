@@ -1,12 +1,12 @@
 # Gesture Tracking Server
-> This application is part of a project called [Immersive OSPray](../README.md).
+> This application is part of a project called [Immersive OSPray](https://github.com/jungwhonam-tacc/Whitepaper).
 
 The server application does three things:
 1. gets body tracking data from a Microsoft Kinect sensor
 2. parses the data (removing unnecessary information, e.g., orientations of joints)
 3. sends the data to connected clients 
 
-## Building Gesture Tracking Server
+## Building and Running Gesture Tracking Server
 > As the application uses Azure Kinect Body Tracking SDK, it only runs in Windows.
 
 > The application uses Microsoft [Kinect](https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md), currently using v1.4.1. 
@@ -36,6 +36,11 @@ CMake options to note (all have sensible defaults):
 * Set the variable ```k4a_DIR_PATH``` to the folder where Azure Kinect SDK is installed, e.g., `C:/Program Files/Azure Kinect SDK v1.4.1/`. 
 * Set the variable ```k4abt_DIR_PATH``` to the folder where Azure Kinect Body Tracking SDK is installed, e.g., `C:/Program Files/Azure Kinect Body Tracking SDK/`. Azure Kinect Body Tracking SDK requires Azure Kinect SDK.
 
+To run the application, type the following command:
+```
+./Release/GestureTrackingServer.exe
+```
+> It can take seconds to start the sensor. When successfully started, the application will output `Sending the frame i...`
 
 ## Implementation Details
 ![](GestureTrackingServer.png)
