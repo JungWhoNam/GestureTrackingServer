@@ -1,5 +1,5 @@
 # Gesture Tracking Server
-> This application is part of a project called [Immersive OSPray](https://github.com/jungwhonam-tacc/Whitepaper).
+> This application is part of a project called [Immersive OSPray](https://github.com/jungwhonam/ImmersiveOSPRay).
 
 The server application does three things:
 1. gets body tracking data from a Microsoft Kinect sensor
@@ -12,7 +12,7 @@ The server application does three things:
 > The application uses Microsoft [Kinect](https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md), currently using v1.4.1. 
 
 ```
-git clone https://github.com/jungwhonam-tacc/GestureTrackingServer.git
+git clone https://github.com/jungwhonam/GestureTrackingServer.git
 cd GestureTrackingServer
 
 mkdir build
